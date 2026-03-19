@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://open.er-api.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=()">
+<meta name="description" content="MultiConvert — Conversor universal de monedas, medidas, pesos, colores, números, zonas horarias, texto, IVA y más.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#c8f064">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MultiConvert">
+<meta property="og:title" content="MultiConvert — Conversor Universal">
+<meta property="og:description" content="Convertí monedas, medidas, colores, números y más. Gratis y sin registro.">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230e0f11'/><text y='72' x='10' font-size='72'>⇄</text></svg>">
+<title>MultiConvert — Conversor Universal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f11;--surface:#16181c;--surface2:#1e2126;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#f0ede8;--muted:#7a7d85;--accent:#c8f064;--accent2:#64c8f0;--accent3:#f0a064;--accent4:#c064f0;--radius:14px;--radius-sm:8px;--shadow:0 2px 20px rgba(0,0,0,0.4);}
+[data-theme="light"]{--bg:#f4f3ef;--surface:#ffffff;--surface2:#f0efe9;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);--text:#1a1a18;--muted:#888880;--shadow:0 2px 20px rgba(0,0,0,0.08);}
+#splash{position:fixed;inset:0;z-index:9999;background:#0e0f11;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity 0.5s ease,visibility 0.5s ease;}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-logo{font-family:'Fraunces',serif;font-size:3rem;font-weight:300;color:#f0ede8;letter-spacing:-0.03em;animation:fadeUp 0.6s ease both;}
+.splash-logo span{color:#c8f064;font-style:italic;}
+.splash-bar{width:200px;height:2px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;}
+.splash-fill{height:100%;width:0%;background:#c8f064;border-radius:99px;animation:loadBar 1.2s ease forwards;}
+.splash-sub{font-family:'DM Mono',monospace;font-size:0.65rem;color:#7a7d85;letter-spacing:0.15em;text-transform:uppercase;animation:fadeUp 0.6s 0.2s ease both;}
+@keyframes loadBar{from{width:0%}to{width:100%}}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,240,100,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(200,240,100,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;opacity:0.12;}
+.orb1{width:500px;height:500px;background:var(--accent);top:-150px;left:-100px;}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-100px;right:-100px;}
+header{position:relative;z-index:10;padding:2rem 2rem 0;max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;animation:fadeUp 0.6s ease both;}
+.header-left{display:flex;align-items:baseline;gap:0.75rem;}
+.logo{font-family:'Fraunces',serif;font-size:2rem;font-weight:300;letter-spacing:-0.03em;}
+.logo span{color:var(--accent);font-style:italic;}
+.tagline{font-size:0.65rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+.header-actions{display:flex;gap:8px;align-items:center;}
+.theme-btn{background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:7px 12px;cursor:pointer;font-size:14px;transition:all 0.2s;color:var(--text);display:flex;align-items:center;gap:5px;}
+.theme-btn:hover{border-color:var(--border2);}
+.theme-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);}
+#install-btn{display:none;background:var(--accent);border:none;border-radius:99px;padding:7px 14px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:500;color:#0e0f11;letter-spacing:0.05em;transition:all 0.2s;}
+#install-btn.show{display:flex;align-items:center;gap:5px;}
+#kofi-btn{background:#6F4E37;border:none;border-radius:99px;padding:7px 14px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:500;color:#fff;letter-spacing:0.05em;text-decoration:none;display:flex;align-items:center;gap:5px;transition:opacity 0.2s;}
+#kofi-btn:hover{opacity:0.85;}
+main{position:relative;z-index:10;max-width:920px;margin:1.5rem auto;padding:0 2rem 4rem;}
+.tabs{display:flex;gap:5px;margin-bottom:1.5rem;flex-wrap:wrap;animation:fadeUp 0.6s 0.1s ease both;}
+.tab-btn{padding:7px 13px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.67rem;letter-spacing:0.04em;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+.tab-btn:hover{border-color:var(--border2);color:var(--text);}
+.tab-btn.active{color:#0e0f11;font-weight:500;}
+.tab-btn[data-color="1"].active{background:var(--accent);border-color:var(--accent);}
+.tab-btn[data-color="2"].active{background:var(--accent2);border-color:var(--accent2);}
+.tab-btn[data-color="3"].active{background:var(--accent3);border-color:var(--accent3);}
+.tab-btn[data-color="4"].active{background:var(--accent4);border-color:var(--accent4);}
+.tab-btn[data-color="5"].active{background:#f064a0;border-color:#f064a0;}
+.tab-btn[data-color="6"].active{background:#64f0c8;border-color:#64f0c8;}
+.tab-btn[data-color="7"].active{background:#f0d064;border-color:#f0d064;}
+.tab-btn[data-color="8"].active{background:#a0f064;border-color:#a0f064;}
+.tab-btn[data-color="9"].active{background:#64a0f0;border-color:#64a0f0;}
+.tab-btn[data-color="10"].active{background:#f09664;border-color:#f09664;}
+.tab-btn[data-color="11"].active{background:#64f0a0;border-color:#64f0a0;}
+.panel{display:none;animation:fadeUp 0.3s ease both;}
+.panel.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);transition:background 0.3s,border-color 0.3s;}
+.card-title{font-family:'Fraunces',serif;font-size:1rem;font-weight:300;color:var(--muted);margin-bottom:1.25rem;}
+.row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px;}
+.field label{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:0.88rem;padding:9px 12px;width:100%;outline:none;transition:border-color 0.2s,background 0.3s;-webkit-appearance:none;appearance:none;}
+.field textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a7d85' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;cursor:pointer;}
+.field select option{background:#1e2126;}
+[data-theme="light"] .field select option{background:#f0efe9;}
+.swap-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-size:1rem;padding:9px 12px;cursor:pointer;transition:all 0.2s;align-self:flex-end;line-height:1;}
+.swap-btn:hover{border-color:var(--border2);color:var(--text);transform:rotate(180deg);}
+.copy-btn{background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted);font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.08em;padding:5px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;transition:background 0.3s;}
+.result-left{display:flex;flex-direction:column;gap:4px;}
+.result-num{font-family:'Fraunces',serif;font-size:2rem;font-weight:300;letter-spacing:-0.02em;line-height:1;}
+.result-num.a1{color:var(--accent)}.result-num.a2{color:var(--accent2)}.result-num.a3{color:var(--accent3)}.result-num.a4{color:var(--accent4)}.result-num.a5{color:#f064a0}.result-num.a6{color:#64f0c8}.result-num.a7{color:#f0d064}.result-num.a9{color:#64a0f0}.result-num.a10{color:#f09664}.result-num.a11{color:#64f0a0}
+.result-sub{font-size:0.67rem;color:var(--muted);letter-spacing:0.04em;}
+.live-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:rgba(200,240,100,0.08);border:1px solid rgba(200,240,100,0.2);border-radius:99px;padding:3px 9px;margin-bottom:1rem;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite;}
+.cat-grid{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1rem;}
+.cat-btn{padding:4px 11px;border-radius:99px;border:1px solid var(--border);background:transparent;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.07em;color:var(--muted);transition:all 0.2s;}
+.cat-btn:hover{border-color:var(--border2);color:var(--text);}
+.cat-btn.active{border-color:var(--accent2);color:var(--accent2);background:rgba(100,200,240,0.07);}
+.history-section{margin-top:1rem;}
+.history-title{font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;display:flex;justify-content:space-between;}
+.history-clear{cursor:pointer;color:var(--muted);font-size:0.6rem;background:none;border:none;font-family:'DM Mono',monospace;letter-spacing:0.1em;transition:color 0.2s;}
+.history-clear:hover{color:#f064a0;}
+.history-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;}
+.history-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 11px;font-size:0.7rem;color:var(--muted);cursor:pointer;transition:all 0.15s;display:flex;justify-content:space-between;}
+.history-item:hover{border-color:var(--border2);color:var(--text);}
+.color-preview{width:100%;height:70px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:0.75rem;transition:background 0.2s;}
+.color-swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:0.75rem;}
+.swatch{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform 0.15s;}
+.swatch:hover{transform:scale(1.2);}
+.color-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:0.75rem;}
+.color-val{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;cursor:pointer;transition:border-color 0.2s;}
+.color-val:hover{border-color:var(--accent);}
+.color-val-label{font-size:0.58rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+.color-val-num{font-size:0.82rem;color:var(--text);}
+.base-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:0.75rem;}
+.base-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem;}
+.base-label{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.base-val{font-size:1rem;color:var(--text);word-break:break-all;}
+.tz-clocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:0.75rem;}
+.tz-clock{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem;}
+.tz-name{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.tz-time{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:300;color:var(--text);}
+.tz-date{font-size:0.62rem;color:var(--muted);margin-top:3px;}
+.upload-zone{border:1px dashed var(--border2);border-radius:var(--radius);padding:2rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+.upload-zone:hover{border-color:var(--accent4);background:rgba(192,100,240,0.04);}
+.upload-icon{font-size:2rem;margin-bottom:0.6rem;}
+.upload-text{font-size:0.72rem;color:var(--muted);letter-spacing:0.04em;}
+.upload-text span{color:var(--accent4);}
+.preview-row{display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;}
+.preview-box{flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem;text-align:center;}
+.preview-box img{max-width:100%;max-height:120px;border-radius:6px;object-fit:contain;margin-bottom:0.4rem;}
+.preview-label{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.preview-meta{font-size:0.65rem;color:var(--muted);}
+.dl-btn{display:block;width:100%;margin-top:0.75rem;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--accent4);background:rgba(192,100,240,0.08);color:var(--accent4);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.07em;cursor:pointer;transition:all 0.2s;}
+.dl-btn:hover{background:rgba(192,100,240,0.16);}
+.energy-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:7px;margin-top:0.75rem;}
+.energy-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.9rem;}
+.energy-label{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.energy-val{font-size:0.92rem;color:#64a0f0;}
+.text-ops{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
+.text-op-btn{padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:transparent;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.06em;color:var(--muted);transition:all 0.2s;}
+.text-op-btn:hover{border-color:var(--border2);color:var(--text);}
+.text-op-btn.active{border-color:#f064a0;color:#f064a0;background:rgba(240,100,160,0.07);}
+.text-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:0.75rem;}
+.text-stat{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 11px;font-size:0.63rem;color:var(--muted);}
+.text-stat span{color:var(--text);font-weight:500;}
+.iva-rates{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
+.iva-rate-btn{padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:transparent;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);transition:all 0.2s;}
+.iva-rate-btn.active{border-color:#64f0a0;color:#64f0a0;background:rgba(100,240,160,0.07);}
+.iva-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:0.75rem;}
+.iva-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;}
+.iva-label{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.iva-val{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:300;}
+.iva-val.green{color:#64f0a0}.iva-val.orange{color:var(--accent3)}.iva-val.blue{color:var(--accent2)}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surface);border:1px solid var(--accent);color:var(--accent);border-radius:99px;padding:8px 20px;font-size:0.7rem;letter-spacing:0.08em;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+footer{position:relative;z-index:10;text-align:center;padding:2rem;font-size:0.62rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;}
+.err{font-size:0.65rem;color:#f06464;margin-top:0.4rem;}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--surface2);border-radius:99px;outline:none;border:1px solid var(--border);margin-top:6px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent4);cursor:pointer;border:2px solid var(--bg);}
+
+/* COOKIE BANNER */
+#cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:8888;background:var(--surface);border-top:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;box-shadow:0 -4px 20px rgba(0,0,0,0.3);transform:translateY(0);transition:transform 0.4s ease;}
+#cookie-banner.hidden{transform:translateY(120%);}
+.cookie-text{font-size:0.68rem;color:var(--muted);max-width:600px;line-height:1.6;}
+.cookie-text a{color:var(--accent2);text-decoration:none;}
+.cookie-text a:hover{text-decoration:underline;}
+.cookie-btns{display:flex;gap:8px;flex-shrink:0;}
+.cookie-accept{background:var(--accent);border:none;border-radius:99px;padding:8px 18px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.68rem;font-weight:500;color:#0e0f11;transition:opacity 0.2s;}
+.cookie-accept:hover{opacity:0.85;}
+.cookie-reject{background:transparent;border:1px solid var(--border2);border-radius:99px;padding:8px 18px;cursor:pointer;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);transition:all 0.2s;}
+.cookie-reject:hover{border-color:var(--border2);color:var(--text);}
+/* ADSENSE SLOTS */
+.ad-slot{width:100%;margin:1rem 0;min-height:90px;background:var(--surface2);border:1px dashed var(--border2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+/* FOOTER KOFI */
+.footer-support{margin-top:0.75rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.62rem;color:var(--muted);}
+.footer-kofi-link{color:#6F4E37;text-decoration:none;font-weight:500;}
+.footer-kofi-link:hover{text-decoration:underline;}
+/* PRIVACY PAGE */
+.privacy-content{max-width:700px;margin:0 auto;line-height:1.8;font-size:0.82rem;}
+.privacy-content h2{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:300;color:var(--muted);margin:1.5rem 0 0.5rem;}
+.privacy-content p{color:var(--muted);margin-bottom:0.75rem;}
+.privacy-content a{color:var(--accent2);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@media(max-width:600px){header{flex-direction:column;gap:0.75rem;padding:1.25rem 1rem 0;}main{padding:0 1rem 3rem;}.logo{font-size:1.6rem;}.result-num{font-size:1.6rem;}.card{padding:1.1rem;}.header-actions{width:100%;justify-content:flex-end;}}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-logo">Multi<span>Convert</span></div>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+  <div class="splash-sub">cargando conversor universal</div>
+</div>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<header>
+  <div class="header-left">
+    <div class="logo">Multi<span>Convert</span></div>
+    <div class="tagline">conversor universal</div>
+  </div>
+  <div class="header-actions">
+    <button id="install-btn" onclick="installPWA()">📲 Instalar app</button>
+    <a href="https://cafecito.app/Multiconvert" target="_blank" rel="noopener noreferrer" id="kofi-btn" title="Invitame un cafecito 🧉">🧉 Cafecito</a>
+    <button class="theme-btn" onclick="toggleTheme()">
+      <span id="theme-icon">☀️</span>
+      <span class="theme-label" id="theme-label">Claro</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn" data-color="1" onclick="showTab('currency',this)">💱 Monedas</button>
+    <button class="tab-btn" data-color="2" onclick="showTab('units',this)">📏 Medidas</button>
+    <button class="tab-btn" data-color="3" onclick="showTab('weight',this)">⚖️ Pesos</button>
+    <button class="tab-btn" data-color="4" onclick="showTab('files',this)">🖼️ Archivos</button>
+    <button class="tab-btn" data-color="5" onclick="showTab('colors',this)">🎨 Colores</button>
+    <button class="tab-btn" data-color="6" onclick="showTab('numbers',this)">🔢 Números</button>
+    <button class="tab-btn" data-color="7" onclick="showTab('timezone',this)">🕐 Zonas</button>
+    <button class="tab-btn" data-color="8" onclick="showTab('percent',this)">% Porcentajes</button>
+    <button class="tab-btn" data-color="9" onclick="showTab('energy',this)">⚡ Energía</button>
+    <button class="tab-btn" data-color="10" onclick="showTab('text',this)">📝 Texto</button>
+    <button class="tab-btn" data-color="11" onclick="showTab('iva',this)">🧾 IVA</button>
+  </div>
+
+  <!-- MONEDAS -->
+  <div id="tab-currency" class="panel active">
+    <div class="card">
+      <div class="live-badge"><div class="live-dot"></div> Tasas en tiempo real</div>
+      <div class="card-title">Conversor de divisas</div>
+      <div class="row">
+        <div class="field"><label>Monto</label><input type="number" id="c-amount" value="1" oninput="convertCurrency()"></div>
+        <div class="field"><label>De</label><select id="c-from" onchange="convertCurrency()"></select></div>
+        <button class="swap-btn" onclick="swapCurrency()">⇄</button>
+        <div class="field"><label>A</label><select id="c-to" onchange="convertCurrency()"></select></div>
+      </div>
+      <div class="result-box">
+        <div class="result-left"><div class="result-num a1" id="c-result">—</div><div class="result-sub" id="c-rate">Cargando...</div></div>
+        <button class="copy-btn" onclick="copyResult('c-result')">📋 Copiar</button>
+      </div>
+      <div id="c-error" class="err"></div>
+      <div class="history-section" id="currency-history-section" style="display:none;">
+        <div class="history-title"><span>Historial</span><button class="history-clear" onclick="clearHistory('currency')">Limpiar</button></div>
+        <div class="history-list" id="currency-history"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDIDAS -->
+  <div id="tab-units" class="panel">
+    <div class="card">
+      <div class="card-title">Conversor de unidades</div>
+      <div class="cat-grid" id="unit-cats"></div>
+      <div class="row">
+        <div class="field"><label>Valor</label><input type="number" id="u-amount" value="1" oninput="convertUnit()"></div>
+        <div class="field"><label>De</label><select id="u-from" onchange="convertUnit()"></select></div>
+        <button class="swap-btn" onclick="swapUnit()">⇄</button>
+        <div class="field"><label>A</label><select id="u-to" onchange="convertUnit()"></select></div>
+      </div>
+      <div class="result-box">
+        <div class="result-left"><div class="result-num a2" id="u-result">—</div><div class="result-sub" id="u-formula"></div></div>
+        <button class="copy-btn" onclick="copyResult('u-result')">📋 Copiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PESOS -->
+  <div id="tab-weight" class="panel">
+    <div class="card">
+      <div class="card-title">Conversor de masa y peso</div>
+      <div class="row">
+        <div class="field"><label>Valor</label><input type="number" id="w-amount" value="1" oninput="convertWeight()"></div>
+        <div class="field"><label>De</label><select id="w-from" onchange="convertWeight()"></select></div>
+        <button class="swap-btn" onclick="swapWeight()">⇄</button>
+        <div class="field"><label>A</label><select id="w-to" onchange="convertWeight()"></select></div>
+      </div>
+      <div class="result-box">
+        <div class="result-left"><div class="result-num a3" id="w-result">—</div><div class="result-sub" id="w-sub"></div></div>
+        <button class="copy-btn" onclick="copyResult('w-result')">📋 Copiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHIVOS -->
+  <div id="tab-files" class="panel">
+    <div class="card">
+      <div class="card-title">Conversor de imágenes</div>
+      <div class="row" style="margin-bottom:1rem;">
+        <div class="field" style="max-width:180px;"><label>Formato</label><select id="f-format" onchange="reconvert()"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WEBP</option></select></div>
+        <div class="field"><label>Calidad — <span id="f-qval">90%</span></label><input type="range" id="f-quality" min="10" max="100" value="90" oninput="document.getElementById('f-qval').textContent=this.value+'%';reconvert()"></div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('f-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent4)'" ondragleave="this.style.borderColor=''" ondrop="handleDrop(event)">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text">Arrastrá o hacé <span>clic aquí</span><br>JPG · PNG · WEBP · GIF</div>
+        <input type="file" id="f-input" accept="image/*" style="display:none" onchange="handleFile(this)">
+      </div>
+      <div id="preview-area" style="display:none;">
+        <div class="preview-row">
+          <div class="preview-box"><div class="preview-label">Original</div><img id="orig-img" alt="original"><div class="preview-meta" id="orig-info"></div></div>
+          <div class="preview-box"><div class="preview-label">Convertida</div><img id="conv-img" alt="convertida"><div class="preview-meta" id="conv-info"></div></div>
+        </div>
+        <button class="dl-btn" id="dl-btn">⬇ Descargar imagen convertida</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLORES -->
+  <div id="tab-colors" class="panel">
+    <div class="card">
+      <div class="card-title">Conversor de colores</div>
+      <div class="row" style="margin-bottom:0.75rem;">
+        <div class="field"><label>Picker</label><input type="color" id="color-picker" value="#c8f064" oninput="updateColor(this.value)" style="height:42px;padding:3px;cursor:pointer;"></div>
+        <div class="field"><label>HEX</label><input type="text" id="hex-input" value="#c8f064" oninput="hexChanged(this.value)" placeholder="#rrggbb"></div>
+      </div>
+      <div class="color-preview" id="color-preview" style="background:#c8f064;"></div>
+      <div class="color-inputs">
+        <div class="color-val" onclick="copyText(document.getElementById('hex-display').textContent)"><div class="color-val-label">HEX</div><div class="color-val-num" id="hex-display">#C8F064</div></div>
+        <div class="color-val" onclick="copyText(document.getElementById('rgb-display').textContent)"><div class="color-val-label">RGB</div><div class="color-val-num" id="rgb-display">200, 240, 100</div></div>
+        <div class="color-val" onclick="copyText(document.getElementById('hsl-display').textContent)"><div class="color-val-label">HSL</div><div class="color-val-num" id="hsl-display">82°, 84%, 67%</div></div>
+      </div>
+      <div style="font-size:0.6rem;color:var(--muted);margin-top:0.5rem;">Clic en cualquier valor para copiarlo</div>
+      <div class="color-swatches" id="swatches"></div>
+    </div>
+  </div>
+
+  <!-- NÚMEROS -->
+  <div id="tab-numbers" class="panel">
+    <div class="card">
+      <div class="card-title">Conversor de bases numéricas</div>
+      <div class="cat-grid" id="num-cats">
+        <button class="cat-btn active" onclick="setNumBase('decimal',this)">Decimal</button>
+        <button class="cat-btn" onclick="setNumBase('binary',this)">Binario</button>
+        <button class="cat-btn" onclick="setNumBase('hex',this)">Hexadecimal</button>
+        <button class="cat-btn" onclick="setNumBase('octal',this)">Octal</button>
+      </div>
+      <div class="field" style="margin-bottom:0.75rem;"><label id="num-label">Número decimal</label><input type="text" id="num-input" value="255" oninput="convertBases()"></div>
+      <div class="base-grid">
+        <div class="base-card"><div class="base-label">Decimal (base 10)</div><div class="base-val" id="base-dec">255</div></div>
+        <div class="base-card"><div class="base-label">Binario (base 2)</div><div class="base-val" id="base-bin">11111111</div></div>
+        <div class="base-card"><div class="base-label">Hexadecimal (base 16)</div><div class="base-val" id="base-hex">FF</div></div>
+        <div class="base-card"><div class="base-label">Octal (base 8)</div><div class="base-val" id="base-oct">377</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONAS -->
+  <div id="tab-timezone" class="panel">
+    <div class="card">
+      <div class="card-title">Zonas horarias del mundo</div>
+      <div class="row" style="margin-bottom:1rem;"><div class="field"><label>Fecha y hora base</label><input type="datetime-local" id="tz-input" oninput="updateTimezones()"></div></div>
+      <div class="tz-clocks" id="tz-clocks"></div>
+    </div>
+  </div>
+
+  <!-- PORCENTAJES -->
+  <div id="tab-percent" class="panel">
+    <div class="card">
+      <div class="card-title">Calculadora de porcentajes</div>
+      <div style="margin-bottom:1.25rem;">
+        <div class="result-sub" style="margin-bottom:0.6rem;">¿Cuánto es X% de Y?</div>
+        <div class="row"><div class="field"><label>Porcentaje %</label><input type="number" id="p1-pct" value="20" oninput="calcPct1()"></div><div style="align-self:flex-end;padding-bottom:10px;color:var(--muted);font-size:0.75rem;">de</div><div class="field"><label>Valor total</label><input type="number" id="p1-val" value="500" oninput="calcPct1()"></div></div>
+        <div class="result-box"><div class="result-left"><div class="result-num a7" id="p1-result">100</div></div><button class="copy-btn" onclick="copyResult('p1-result')">📋 Copiar</button></div>
+      </div>
+      <div style="margin-bottom:1.25rem;">
+        <div class="result-sub" style="margin-bottom:0.6rem;">¿X es qué % de Y?</div>
+        <div class="row"><div class="field"><label>Valor parcial</label><input type="number" id="p2-part" value="75" oninput="calcPct2()"></div><div style="align-self:flex-end;padding-bottom:10px;color:var(--muted);font-size:0.75rem;">de</div><div class="field"><label>Valor total</label><input type="number" id="p2-total" value="200" oninput="calcPct2()"></div></div>
+        <div class="result-box"><div class="result-left"><div class="result-num a7" id="p2-result">37.5%</div></div><button class="copy-btn" onclick="copyResult('p2-result')">📋 Copiar</button></div>
+      </div>
+      <div>
+        <div class="result-sub" style="margin-bottom:0.6rem;">Variación porcentual (de X a Y)</div>
+        <div class="row"><div class="field"><label>Valor inicial</label><input type="number" id="p3-from" value="80" oninput="calcPct3()"></div><div style="align-self:flex-end;padding-bottom:10px;color:var(--muted);font-size:0.75rem;">→</div><div class="field"><label>Valor final</label><input type="number" id="p3-to" value="100" oninput="calcPct3()"></div></div>
+        <div class="result-box"><div class="result-left"><div class="result-num a7" id="p3-result">+25%</div><div class="result-sub" id="p3-sub">aumento del 25%</div></div><button class="copy-btn" onclick="copyResult('p3-result')">📋 Copiar</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENERGÍA -->
+  <div id="tab-energy" class="panel">
+    <div class="card">
+      <div class="card-title">Conversor de energía</div>
+      <div class="row" style="margin-bottom:0.75rem;">
+        <div class="field"><label>Valor</label><input type="number" id="e-amount" value="1" oninput="convertEnergy()"></div>
+        <div class="field"><label>Unidad</label><select id="e-from" onchange="convertEnergy()"><option value="j">Joule (J)</option><option value="kj">Kilojoule (kJ)</option><option value="cal">Caloría (cal)</option><option value="kcal">Kilocaloría (kcal)</option><option value="kwh">Kilovatio-hora (kWh)</option><option value="wh">Vatio-hora (Wh)</option><option value="ev">Electronvolt (eV)</option><option value="btu">BTU</option></select></div>
+      </div>
+      <div class="energy-results" id="energy-results"></div>
+    </div>
+  </div>
+
+  <!-- TEXTO -->
+  <div id="tab-text" class="panel">
+    <div class="card">
+      <div class="card-title">Herramientas de texto</div>
+      <div class="text-ops">
+        <button class="text-op-btn active" onclick="setTextOp('upper',this)">MAYÚSCULAS</button>
+        <button class="text-op-btn" onclick="setTextOp('lower',this)">minúsculas</button>
+        <button class="text-op-btn" onclick="setTextOp('title',this)">Título</button>
+        <button class="text-op-btn" onclick="setTextOp('sentence',this)">Oración</button>
+        <button class="text-op-btn" onclick="setTextOp('reverse',this)">oditrevnI</button>
+        <button class="text-op-btn" onclick="setTextOp('noaccents',this)">Sin acentos</button>
+        <button class="text-op-btn" onclick="setTextOp('slug',this)">slug-url</button>
+        <button class="text-op-btn" onclick="setTextOp('trim',this)">Sin espacios extra</button>
+      </div>
+      <div class="field" style="margin-bottom:0.75rem;"><label>Texto de entrada</label><textarea id="text-input" oninput="convertText()" placeholder="Escribí o pegá tu texto aquí...">Hola Mundo, este es un ejemplo de texto para convertir.</textarea></div>
+      <div class="field" style="margin-bottom:0.75rem;"><label>Resultado</label><textarea id="text-output" readonly style="background:var(--surface2);border-color:var(--border);"></textarea></div>
+      <div style="display:flex;justify-content:flex-end;"><button class="copy-btn" onclick="copyText(document.getElementById('text-output').value)">📋 Copiar resultado</button></div>
+      <div class="text-stats" id="text-stats"></div>
+    </div>
+  </div>
+
+  <!-- IVA -->
+  <div id="tab-iva" class="panel">
+    <div class="card">
+      <div class="card-title">Calculadora de IVA — Argentina</div>
+      <div class="iva-rates">
+        <button class="iva-rate-btn active" onclick="setIvaRate(21,this)">IVA 21%</button>
+        <button class="iva-rate-btn" onclick="setIvaRate(10.5,this)">IVA 10.5%</button>
+        <button class="iva-rate-btn" onclick="setIvaRate(27,this)">IVA 27%</button>
+        <button class="iva-rate-btn" onclick="setIvaRate(2.5,this)">IVA 2.5%</button>
+        <button class="iva-rate-btn" onclick="setIvaRate(5,this)">IVA 5%</button>
+        <button class="iva-rate-btn" onclick="setIvaRate(0,this)">Exento 0%</button>
+      </div>
+      <div class="row" style="margin-bottom:0.5rem;">
+        <div class="field"><label>Monto</label><input type="number" id="iva-amount" value="1000" oninput="calcIva()"></div>
+        <div class="field"><label>Tipo de precio</label><select id="iva-type" onchange="calcIva()"><option value="sin">Sin IVA (precio neto)</option><option value="con">Con IVA (precio final)</option></select></div>
+      </div>
+      <div class="iva-grid" id="iva-results"></div>
+    </div>
+  </div>
+
+  <!-- SLOT PUBLICITARIO ADSENSE — reemplazá con tu código real de AdSense -->
+  <!-- Para activar: reemplazá el div.ad-slot por tu <ins class="adsbygoogle"> -->
+  <div class="ad-slot" id="ad-top">📢 Publicidad — Google AdSense irá aquí</div>
+
+</main>
+
+<footer>
+  MultiConvert &mdash; 11 conversores · HTTPS · Sin registro · 100% en tu navegador
+  <div class="footer-support">
+    ¿Te fue útil? <a href="https://cafecito.app/Multiconvert" target="_blank" rel="noopener noreferrer" class="footer-kofi-link">🧉 Invitame un cafecito</a>
+    · <a href="privacidad.html" style="color:var(--muted);text-decoration:none;font-size:0.62rem;">Política de privacidad</a>
+    · <a href="cookies.html" style="color:var(--muted);text-decoration:none;font-size:0.62rem;">Cookies</a>
+  </div>
+</footer>
+<!-- BANNER DE COOKIES — requerido por Google AdSense -->
+<div id="cookie-banner">
+  <div class="cookie-text">
+    Usamos cookies para mostrar publicidad personalizada a través de Google AdSense y mejorar tu experiencia.
+    Al aceptar, consentís el uso de cookies según nuestra <a href="privacidad.html">política de privacidad</a>.
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-reject" onclick="rejectCookies()">Solo esenciales</button>
+    <button class="cookie-accept" onclick="acceptCookies()">Aceptar todo</button>
+  </div>
+</div>
+
+<!-- WIDGET CAFECITO — aparece como botón flotante en móvil -->
+<div id="cafecito-widget" style="position:fixed;bottom:5rem;right:1.5rem;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+  <div id="cafecito-tooltip" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:0.68rem;color:var(--muted);white-space:nowrap;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+    ¿Te fue útil? ¡Invitame un cafecito! ☕
+  </div>
+  <a href="https://cafecito.app/Multiconvert" target="_blank" rel="noopener noreferrer"
+     id="cafecito-fab"
+     onmouseenter="document.getElementById('cafecito-tooltip').style.display='block'"
+     onmouseleave="document.getElementById('cafecito-tooltip').style.display='none'"
+     style="width:48px;height:48px;background:#6F4E37;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.2s,opacity 0.2s;"
+     onmouseenter="this.style.transform='scale(1.1)';document.getElementById('cafecito-tooltip').style.display='block'"
+     onmouseleave="this.style.transform='scale(1)';document.getElementById('cafecito-tooltip').style.display='none'"
+     title="Invitame un cafecito en Cafecito.app">🧉</a>
+</div>
+<div id="toast"></div>
+
+<script>
+// SPLASH
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('splash').classList.add('hidden'),1400));
+
+// THEME
+let isDark=true;
+function toggleTheme(){isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');document.getElementById('theme-icon').textContent=isDark?'☀️':'🌙';document.getElementById('theme-label').textContent=isDark?'Claro':'Oscuro';try{localStorage.setItem('mc-theme',isDark?'dark':'light');}catch(e){}}
+(function(){try{const s=localStorage.getItem('mc-theme');if(s==='light'){isDark=false;document.documentElement.setAttribute('data-theme','light');document.getElementById('theme-icon').textContent='🌙';document.getElementById('theme-label').textContent='Oscuro';}}catch(e){}})();
+
+// PWA
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-btn').classList.add('show');});
+function installPWA(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('install-btn').classList.remove('show');});}
+
+// TABS
+function showTab(name,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');}
+document.querySelector('.tab-btn').classList.add('active');
+
+// TOAST & COPY
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+function copyText(text){if(!text||text==='—')return;try{navigator.clipboard.writeText(text);}catch(e){}showToast('¡Copiado al portapapeles!');}
+function copyResult(id){const el=document.getElementById(id);if(el)copyText(el.textContent);}
+
+// HISTORY
+const histories={currency:[]};
+function addHistory(type,text){if(!histories[type])histories[type]=[];if(histories[type][0]===text)return;histories[type].unshift(text);if(histories[type].length>8)histories[type].pop();renderHistory(type);try{localStorage.setItem('mc-hist-'+type,JSON.stringify(histories[type]));}catch(e){}}
+function renderHistory(type){const list=document.getElementById(type+'-history'),section=document.getElementById(type+'-history-section');if(!list)return;if(histories[type].length===0){if(section)section.style.display='none';return;}if(section)section.style.display='block';list.innerHTML=histories[type].map(h=>`<div class="history-item" onclick="copyText('${h.replace(/'/g,"\\'")}')" ><span>${h}</span><span style="font-size:0.58rem;opacity:0.5">copiar</span></div>`).join('');}
+function clearHistory(type){histories[type]=[];renderHistory(type);try{localStorage.removeItem('mc-hist-'+type);}catch(e){}}
+(function(){['currency'].forEach(type=>{try{const s=localStorage.getItem('mc-hist-'+type);if(s){histories[type]=JSON.parse(s);renderHistory(type);}}catch(e){}});})();
+
+// CURRENCY
+const CURRENCIES=['USD','EUR','ARS','BRL','GBP','JPY','CHF','CAD','AUD','MXN','CLP','COP','PEN','UYU','CNY','INR','KRW','SGD','NOK','SEK','DKK','NZD','ZAR','TRY','RUB','HKD','SAR','AED'];
+let rates={},ratesDate='';
+async function loadRates(){try{const r=await fetch('https://open.er-api.com/v6/latest/USD'),d=await r.json();rates=d.rates;ratesDate=d.time_last_update_utc||'';document.getElementById('c-error').textContent='';}catch(e){rates={USD:1,EUR:0.92,ARS:1050,BRL:4.97,GBP:0.79,JPY:149.5,CHF:0.88,CAD:1.36,AUD:1.52,MXN:17.1,CLP:970,COP:3900,PEN:3.75,UYU:39,CNY:7.23,INR:83,KRW:1330,SGD:1.34,NOK:10.6,SEK:10.4,DKK:6.89,NZD:1.63,ZAR:18.6,TRY:32.1,RUB:92.5,HKD:7.82,SAR:3.75,AED:3.67};document.getElementById('c-error').textContent='⚠ Sin conexión — tasas aproximadas';}convertCurrency();}
+function buildCurrencySelects(){const f=document.getElementById('c-from'),t=document.getElementById('c-to');CURRENCIES.forEach(c=>{f.innerHTML+=`<option value="${c}">${c}</option>`;t.innerHTML+=`<option value="${c}">${c}</option>`;});f.value='USD';t.value='ARS';}
+function convertCurrency(){const amt=parseFloat(document.getElementById('c-amount').value)||0,from=document.getElementById('c-from').value,to=document.getElementById('c-to').value;if(!rates[from]||!rates[to])return;const res=amt/rates[from]*rates[to],rate=1/rates[from]*rates[to],resText=formatNum(res)+' '+to;document.getElementById('c-result').textContent=resText;document.getElementById('c-rate').textContent='1 '+from+' = '+formatNum(rate)+' '+to+(ratesDate?' · '+ratesDate.slice(5,16):'');if(amt>0)addHistory('currency',amt+' '+from+' = '+resText);}
+function swapCurrency(){const f=document.getElementById('c-from'),t=document.getElementById('c-to');[f.value,t.value]=[t.value,f.value];convertCurrency();}
+
+// UNITS
+const UNITS={'Longitud':{units:['metro','kilómetro','milla','pie','pulgada','centímetro','milímetro','yarda','milla náutica'],toBase:[1,1000,1609.344,0.3048,0.0254,0.01,0.001,0.9144,1852]},'Área':{units:['m²','km²','hectárea','acre','pie²','pulgada²','milla²','cm²'],toBase:[1,1e6,10000,4046.856,0.0929,6.452e-4,2589988,1e-4]},'Velocidad':{units:['km/h','mph','m/s','nudo','pie/s'],toBase:[1,1.60934,3.6,1.852,1.09728]},'Temperatura':{units:['Celsius','Fahrenheit','Kelvin'],special:true},'Volumen':{units:['litro','mililitro','galón US','galón UK','onza líquida','pie³','cm³','m³'],toBase:[1,0.001,3.78541,4.54609,0.0295735,28.3168,0.001,1000]},'Tiempo':{units:['segundo','minuto','hora','día','semana','mes','año'],toBase:[1,60,3600,86400,604800,2629746,31556952]},'Presión':{units:['pascal','kilopascal','bar','atm','psi','mmHg'],toBase:[1,1000,100000,101325,6894.76,133.322]}};
+let curUnitCat='Longitud';
+function buildUnitCats(){const el=document.getElementById('unit-cats');el.innerHTML='';Object.keys(UNITS).forEach(cat=>{const b=document.createElement('button');b.className='cat-btn'+(cat===curUnitCat?' active':'');b.textContent=cat;b.onclick=()=>{curUnitCat=cat;buildUnitCats();buildUnitSelects();convertUnit();};el.appendChild(b);});buildUnitSelects();}
+function buildUnitSelects(){const f=document.getElementById('u-from'),t=document.getElementById('u-to'),cat=UNITS[curUnitCat];f.innerHTML='';t.innerHTML='';cat.units.forEach(u=>{f.innerHTML+=`<option value="${u}">${u}</option>`;t.innerHTML+=`<option value="${u}">${u}</option>`;});t.selectedIndex=1;}
+function convertUnit(){const amt=parseFloat(document.getElementById('u-amount').value);if(isNaN(amt)){document.getElementById('u-result').textContent='—';return;}const f=document.getElementById('u-from').value,t=document.getElementById('u-to').value,cat=UNITS[curUnitCat];let res=cat.special?convertTemp(amt,f,t):amt*cat.toBase[cat.units.indexOf(f)]/cat.toBase[cat.units.indexOf(t)];document.getElementById('u-result').textContent=formatNum(res)+' '+t;document.getElementById('u-formula').textContent=amt+' '+f+' → '+formatNum(res)+' '+t;}
+function convertTemp(v,from,to){let c=from==='Celsius'?v:from==='Fahrenheit'?(v-32)*5/9:v-273.15;return to==='Celsius'?c:to==='Fahrenheit'?c*9/5+32:c+273.15;}
+function swapUnit(){const f=document.getElementById('u-from'),t=document.getElementById('u-to');[f.value,t.value]=[t.value,f.value];convertUnit();}
+
+// WEIGHT
+const WEIGHTS={'Kilogramo':1,'Gramo':0.001,'Miligramo':1e-6,'Tonelada métrica':1000,'Libra':0.453592,'Onza':0.0283495,'Stone':6.35029,'Tonelada corta (US)':907.185,'Tonelada larga (UK)':1016.05,'Carat':0.0002};
+function buildWeightSelects(){const f=document.getElementById('w-from'),t=document.getElementById('w-to');Object.keys(WEIGHTS).forEach(u=>{f.innerHTML+=`<option value="${u}">${u}</option>`;t.innerHTML+=`<option value="${u}">${u}</option>`;});t.selectedIndex=1;}
+function convertWeight(){const amt=parseFloat(document.getElementById('w-amount').value);if(isNaN(amt)){document.getElementById('w-result').textContent='—';return;}const f=document.getElementById('w-from').value,t=document.getElementById('w-to').value,res=amt*WEIGHTS[f]/WEIGHTS[t];document.getElementById('w-result').textContent=formatNum(res)+' '+t;document.getElementById('w-sub').textContent=amt+' '+f+' = '+formatNum(res)+' '+t;}
+function swapWeight(){const f=document.getElementById('w-from'),t=document.getElementById('w-to');[f.value,t.value]=[t.value,f.value];convertWeight();}
+
+// FILES
+let convBlob=null,convExt='png',origImgEl=null;
+function handleDrop(e){e.preventDefault();document.querySelector('.upload-zone').style.borderColor='';const file=e.dataTransfer.files[0];if(file&&file.type.startsWith('image/'))loadImageFile(file);}
+function handleFile(input){if(input.files[0])loadImageFile(input.files[0]);}
+function loadImageFile(file){const reader=new FileReader();reader.onload=e=>{const img=document.getElementById('orig-img');img.src=e.target.result;img.onload=()=>{origImgEl=img;document.getElementById('orig-info').textContent=img.naturalWidth+'×'+img.naturalHeight+'px · '+(file.size/1024).toFixed(1)+' KB';document.getElementById('preview-area').style.display='block';doConvert();};};reader.readAsDataURL(file);}
+function reconvert(){if(origImgEl)doConvert();}
+function doConvert(){const fmt=document.getElementById('f-format').value,q=parseInt(document.getElementById('f-quality').value)/100,canvas=document.createElement('canvas');canvas.width=origImgEl.naturalWidth;canvas.height=origImgEl.naturalHeight;const ctx=canvas.getContext('2d');if(fmt==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}ctx.drawImage(origImgEl,0,0);canvas.toBlob(blob=>{convBlob=blob;convExt=fmt==='image/png'?'png':fmt==='image/jpeg'?'jpg':'webp';document.getElementById('conv-img').src=URL.createObjectURL(blob);document.getElementById('conv-info').textContent=origImgEl.naturalWidth+'×'+origImgEl.naturalHeight+'px · '+(blob.size/1024).toFixed(1)+' KB';},fmt,q);}
+document.getElementById('dl-btn').addEventListener('click',()=>{if(!convBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(convBlob);a.download='imagen-convertida.'+convExt;a.click();});
+
+// COLORS
+const SWATCHES=['#ff6b6b','#ff9f43','#feca57','#48dbfb','#ff9ff3','#54a0ff','#5f27cd','#00d2d3','#1dd1a1','#c8f064','#f0a064','#c064f0'];
+function buildSwatches(){const el=document.getElementById('swatches');SWATCHES.forEach(c=>{const s=document.createElement('div');s.className='swatch';s.style.background=c;s.onclick=()=>updateColor(c);el.appendChild(s);});}
+function updateColor(hex){hex=hex.trim();if(!/^#[0-9a-fA-F]{6}$/.test(hex))return;document.getElementById('color-picker').value=hex;document.getElementById('hex-input').value=hex;document.getElementById('color-preview').style.background=hex;document.getElementById('hex-display').textContent=hex.toUpperCase();const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);document.getElementById('rgb-display').textContent=r+', '+g+', '+b;const hsl=rgbToHsl(r,g,b);document.getElementById('hsl-display').textContent=hsl[0]+'°, '+hsl[1]+'%, '+hsl[2]+'%';}
+function hexChanged(val){if(/^#[0-9a-fA-F]{6}$/.test(val.trim()))updateColor(val.trim());}
+function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min){h=s=0;}else{const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;default:h=(r-g)/d+4;}h=Math.round(h*60);s=Math.round(s*100);l=Math.round(l*100);}return[h,s,l];}
+
+// NUMBER BASES
+let numBase='decimal';
+function setNumBase(base,btn){numBase=base;document.querySelectorAll('#num-cats .cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('num-input').value='';clearBases();}
+function clearBases(){['base-dec','base-bin','base-hex','base-oct'].forEach(id=>document.getElementById(id).textContent='—');}
+function convertBases(){const raw=document.getElementById('num-input').value.trim().toUpperCase();if(!raw){clearBases();return;}let dec;try{if(numBase==='decimal')dec=parseInt(raw,10);else if(numBase==='binary')dec=parseInt(raw,2);else if(numBase==='hex')dec=parseInt(raw,16);else dec=parseInt(raw,8);if(isNaN(dec)||dec<0){clearBases();return;}}catch(e){clearBases();return;}document.getElementById('base-dec').textContent=dec.toString(10);document.getElementById('base-bin').textContent=dec.toString(2);document.getElementById('base-hex').textContent=dec.toString(16).toUpperCase();document.getElementById('base-oct').textContent=dec.toString(8);}
+
+// TIMEZONES
+const TIMEZONES=[{label:'Buenos Aires',tz:'America/Argentina/Buenos_Aires'},{label:'New York',tz:'America/New_York'},{label:'London',tz:'Europe/London'},{label:'Madrid',tz:'Europe/Madrid'},{label:'Tokio',tz:'Asia/Tokyo'},{label:'Sídney',tz:'Australia/Sydney'},{label:'Dubai',tz:'Asia/Dubai'},{label:'México',tz:'America/Mexico_City'},{label:'São Paulo',tz:'America/Sao_Paulo'},{label:'Los Ángeles',tz:'America/Los_Angeles'},{label:'París',tz:'Europe/Paris'},{label:'Moscú',tz:'Europe/Moscow'}];
+function initTimezone(){const now=new Date(),pad=n=>String(n).padStart(2,'0');document.getElementById('tz-input').value=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());buildTzClocks();updateTimezones();setInterval(updateTimezones,30000);}
+function buildTzClocks(){const el=document.getElementById('tz-clocks');el.innerHTML='';TIMEZONES.forEach(tz=>{el.innerHTML+=`<div class="tz-clock"><div class="tz-name">${tz.label}</div><div class="tz-time" id="tztime-${tz.tz.replace(/\//g,'-')}">—</div><div class="tz-date" id="tzdate-${tz.tz.replace(/\//g,'-')}">—</div></div>`;});}
+function updateTimezones(){const val=document.getElementById('tz-input').value,base=val?new Date(val):new Date();TIMEZONES.forEach(tz=>{const key=tz.tz.replace(/\//g,'-');try{document.getElementById('tztime-'+key).textContent=base.toLocaleTimeString('es-AR',{timeZone:tz.tz,hour:'2-digit',minute:'2-digit',hour12:false});document.getElementById('tzdate-'+key).textContent=base.toLocaleDateString('es-AR',{timeZone:tz.tz,weekday:'short',day:'numeric',month:'short'});}catch(e){}});}
+
+// PERCENTAGE
+function calcPct1(){const pct=parseFloat(document.getElementById('p1-pct').value)||0,val=parseFloat(document.getElementById('p1-val').value)||0;document.getElementById('p1-result').textContent=formatNum(pct*val/100);}
+function calcPct2(){const part=parseFloat(document.getElementById('p2-part').value)||0,total=parseFloat(document.getElementById('p2-total').value)||1;document.getElementById('p2-result').textContent=parseFloat((part/total*100).toFixed(4))+'%';}
+function calcPct3(){const from=parseFloat(document.getElementById('p3-from').value)||0,to=parseFloat(document.getElementById('p3-to').value)||0;if(from===0){document.getElementById('p3-result').textContent='—';return;}const diff=((to-from)/Math.abs(from))*100,sign=diff>=0?'+':'';document.getElementById('p3-result').textContent=sign+parseFloat(diff.toFixed(4))+'%';document.getElementById('p3-sub').textContent=diff>=0?'aumento del '+parseFloat(diff.toFixed(2))+'%':'disminución del '+parseFloat(Math.abs(diff).toFixed(2))+'%';}
+
+// ENERGY
+const ENERGY_TO_J={j:1,kj:1000,cal:4.184,kcal:4184,kwh:3600000,wh:3600,ev:1.602e-19,btu:1055.06};
+const ENERGY_NAMES={j:'Joule (J)',kj:'Kilojoule (kJ)',cal:'Caloría (cal)',kcal:'Kilocaloría (kcal)',kwh:'kWh',wh:'Vatio-hora (Wh)',ev:'Electronvolt (eV)',btu:'BTU'};
+function convertEnergy(){const amt=parseFloat(document.getElementById('e-amount').value)||0,from=document.getElementById('e-from').value,joules=amt*ENERGY_TO_J[from],el=document.getElementById('energy-results');el.innerHTML='';Object.entries(ENERGY_TO_J).forEach(([key,factor])=>{if(key===from)return;el.innerHTML+=`<div class="energy-card"><div class="energy-label">${ENERGY_NAMES[key]}</div><div class="energy-val">${formatNum(joules/factor)}</div></div>`;});}
+
+// TEXT
+let textOp='upper';
+function setTextOp(op,btn){textOp=op;document.querySelectorAll('.text-op-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');convertText();}
+function convertText(){const input=document.getElementById('text-input').value;let out='';switch(textOp){case 'upper':out=input.toUpperCase();break;case 'lower':out=input.toLowerCase();break;case 'title':out=input.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());break;case 'sentence':out=input.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g,c=>c.toUpperCase());break;case 'reverse':out=input.split('').reverse().join('');break;case 'noaccents':out=input.normalize('NFD').replace(/[\u0300-\u036f]/g,'');break;case 'slug':out=input.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');break;case 'trim':out=input.replace(/\s+/g,' ').trim();break;}document.getElementById('text-output').value=out;const words=input.trim()?input.trim().split(/\s+/).length:0;document.getElementById('text-stats').innerHTML=`<div class="text-stat">Caracteres: <span>${input.length}</span></div><div class="text-stat">Sin espacios: <span>${input.replace(/\s/g,'').length}</span></div><div class="text-stat">Palabras: <span>${words}</span></div><div class="text-stat">Líneas: <span>${input.split('\n').length}</span></div>`;}
+
+// IVA
+let ivaRate=21;
+function setIvaRate(rate,btn){ivaRate=rate;document.querySelectorAll('.iva-rate-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');calcIva();}
+function calcIva(){const amt=parseFloat(document.getElementById('iva-amount').value)||0,type=document.getElementById('iva-type').value;let neto,iva,total;if(type==='sin'){neto=amt;iva=amt*ivaRate/100;total=amt+iva;}else{total=amt;neto=amt/(1+ivaRate/100);iva=total-neto;}document.getElementById('iva-results').innerHTML=`<div class="iva-card"><div class="iva-label">Precio neto (sin IVA)</div><div class="iva-val blue">$${formatNum(neto)}</div></div><div class="iva-card"><div class="iva-label">IVA ${ivaRate}%</div><div class="iva-val orange">$${formatNum(iva)}</div></div><div class="iva-card"><div class="iva-label">Precio final (con IVA)</div><div class="iva-val green">$${formatNum(total)}</div></div><div class="iva-card"><div class="iva-label">Coeficiente</div><div class="iva-val" style="color:var(--muted)">${(1+ivaRate/100).toFixed(4)}</div></div>`;}
+
+// HELPERS
+function formatNum(n){if(n===0)return'0';if(Math.abs(n)>=1000000)return n.toLocaleString('es-AR',{maximumFractionDigits:0});if(Math.abs(n)>=1000)return n.toLocaleString('es-AR',{maximumFractionDigits:2});if(Math.abs(n)>=1)return parseFloat(n.toFixed(5)).toString();return parseFloat(n.toFixed(8)).toString();}
+
+// COOKIES
+function acceptCookies(){try{localStorage.setItem('mc-cookies','accepted');}catch(e){}document.getElementById('cookie-banner').classList.add('hidden');loadAdSense();}
+function rejectCookies(){try{localStorage.setItem('mc-cookies','rejected');}catch(e){}document.getElementById('cookie-banner').classList.add('hidden');}
+function loadAdSense(){
+  // ACTIVAR ADSENSE: Descomentá las líneas de abajo y reemplazá ca= con tu publisher ID
+  // const s=document.createElement('script');
+  // s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX';
+  // s.async=true; s.crossOrigin='anonymous';
+  // document.head.appendChild(s);
+}
+(function(){try{const c=localStorage.getItem('mc-cookies');if(c==='accepted'){document.getElementById('cookie-banner').classList.add('hidden');loadAdSense();}else if(c==='rejected'){document.getElementById('cookie-banner').classList.add('hidden');}}catch(e){}})();
+
+// INIT
+buildCurrencySelects();buildUnitCats();buildWeightSelects();buildSwatches();updateColor('#c8f064');initTimezone();loadRates();convertUnit();convertWeight();calcPct1();calcPct2();calcPct3();convertBases();convertEnergy();convertText();calcIva();
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "MultiConvert — Conversor Universal",
+  "short_name": "MultiConvert",
+  "description": "Conversor universal de monedas, medidas, pesos, colores, números, texto, IVA y más.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e0f11",
+  "theme_color": "#c8f064",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230e0f11'/><text y='145' x='20' font-size='140' font-family='serif'>⇄</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "lang": "es"
+}
